@@ -1,4 +1,4 @@
-package main
+package controller
 
 import (
 	"backend/internal/models"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (app *application) Home(w http.ResponseWriter, r *http.Request) {
+func Home(w http.ResponseWriter, r *http.Request) {
 	var payload = struct {
 		Status  string `json:"status"`
 		Message string `json:"message"`
@@ -29,7 +29,7 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request) {
 	w.Write(out)
 }
 
-func (app *application) AllMovies(w http.ResponseWriter, r *http.Request) {
+func AllMovies(w http.ResponseWriter, r *http.Request) {
 	var movies []models.Movie
 
 	rd, _ := time.Parse("2006-01-02", "2006-01-04")

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/cmd/controller"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -13,8 +14,10 @@ func (app *application) routes() http.Handler {
 	mux.Use(middleware.Recoverer)
 	mux.Use(app.enableCORS)
 
-	mux.Get("/", app.Home)
-	mux.Get("/movies", app.AllMovies)
+	mux.Get("/", controller.Home)
+	mux.Get("/movies", controller.AllMovies)
+	mux.Get("/users", controller.AllUsers)
+	mux.Put("/users/{id}", controller.UpdateUser)
 
 	return mux
 }
