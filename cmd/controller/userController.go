@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 func AllUsers(w http.ResponseWriter, r *http.Request) {
@@ -27,5 +29,32 @@ func AllUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	// vars := mux.Vars(r)
+	// userId := vars["id"]
+	userId := chi.URLParam(r, "id")
+	fmt.Println("userId:", userId)
 
+	var data struct {
+		ID       string `json:"id"`
+		LastName string `json:"lastName"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// fmt.Println("userId:", data.ID)
+	data.ID = userId // Set the ID field to the value of userId
+	fmt.Println("userId:", data.ID)
+	fmt.Println("lastName:", data.LastName)
+
+	out, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(out)
 }
