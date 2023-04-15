@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
-	"github.com/go-chi/chi"
+	"github.com/gin-gonic/gin"
 )
 
-func AllUsers(w http.ResponseWriter, r *http.Request) {
+func AllUsers(c *gin.Context) {
 	db, _ := model.SqlStart()
 
 	allUsers, err := model.GetRows(db)
@@ -22,39 +23,59 @@ func AllUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(out)
+
+	c.JSON(http.StatusOK, out)
 	defer db.Close()
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	// vars := mux.Vars(r)
-	// userId := vars["id"]
-	userId := chi.URLParam(r, "id")
+func GetUser(c *gin.Context) {
+	db, _ := model.SqlStart()
+
+	paramUserId := c.Param("id")
+	fmt.Println("userId:", paramUserId)
+
+	userId, err := strconv.Atoi(paramUserId)
+	if err != nil {
+		log.Fatalf("GetuUser strconv.Atoi error err:%v", err)
+	}
+
+	var responseData struct {
+		ID        int    `json:"id"`
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Birthday  int    `json:"birthday"`
+		Email     string `json:"email"`
+	}
+
+	user, _ := model.GetSingleRow(db, userId)
+
+	responseData.ID = user.ID
+	responseData.FirstName = user.FirstName
+	responseData.LastName = user.LastName
+	responseData.Birthday = user.Birthday
+	responseData.Email = user.Email
+
+	c.JSON(http.StatusOK, responseData)
+	defer db.Close()
+}
+
+func UpdateUser(c *gin.Context) {
+	userId := c.Param("id")
 	fmt.Println("userId:", userId)
 
 	var data struct {
-		ID       string `json:"id"`
-		LastName string `json:"lastName"`
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Birthday  int    `json:"birthday"`
+		Email     string `json:"email"`
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err := c.BindJSON(&data); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// fmt.Println("userId:", data.ID)
-	data.ID = userId // Set the ID field to the value of userId
-	fmt.Println("userId:", data.ID)
 	fmt.Println("lastName:", data.LastName)
 
-	out, err := json.Marshal(data)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(out)
+	c.JSON(http.StatusOK, data)
 }

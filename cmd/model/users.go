@@ -54,18 +54,18 @@ func GetRows(db *sql.DB) ([]User, error) {
 }
 
 // 条件取得
-func GetSingleRow(db *sql.DB, userID int) {
-	u := &User{}
-	err := db.QueryRow("SELECT * FROM users WHERE id = ?", userID).Scan(&u.ID, &u.FirstName, &u.LastName, &u.Birthday, &u.Email, &u.Password, &u.Created, &u.Updated)
+func GetSingleRow(db *sql.DB, userID int) (User, error) {
+	user := &User{}
+	err := db.QueryRow("SELECT * FROM users WHERE id = ?", userID).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.Birthday, &user.Created, &user.Updated)
 	if errors.Is(err, sql.ErrNoRows) {
 		fmt.Println("getSingleRow no records.")
-		return
 	}
 
 	if err != nil {
 		log.Fatalf("getSingleRow db.QueryRow error err:%v", err)
 	}
-	fmt.Println(u)
+
+	return *user, nil
 }
 
 // 登録処理
@@ -95,6 +95,10 @@ func InsertUser(db *sql.DB, firstName, lastName string, birthday int, email stri
 	})
 
 	return err
+}
+
+func UpdateUser(db *sql.DB, firstName, lastName string, birthday int, email string, password string) error {
+	return nil
 }
 
 // トランザクション

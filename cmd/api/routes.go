@@ -4,20 +4,19 @@ import (
 	"backend/cmd/controller"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 func (app *application) routes() http.Handler {
-	mux := chi.NewRouter()
+	router := gin.Default()
 
-	mux.Use(middleware.Recoverer)
-	mux.Use(app.enableCORS)
+	router.Use(app.enableCORS())
 
-	mux.Get("/", controller.Home)
-	mux.Get("/movies", controller.AllMovies)
-	mux.Get("/users", controller.AllUsers)
-	mux.Put("/users/{id}", controller.UpdateUser)
+	// router.GET("/", controller.Home)
+	// router.GET("/movies", controller.AllMovies)
+	router.GET("/users", controller.AllUsers)
+	router.GET("/users/:id", controller.GetUser)
+	router.PUT("/users/:id", controller.UpdateUser)
 
-	return mux
+	return router
 }
