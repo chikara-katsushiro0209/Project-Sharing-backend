@@ -59,15 +59,47 @@ func GetUser(c *gin.Context) {
 	defer db.Close()
 }
 
+func InsertUser(c *gin.Context) {
+	db, _ := model.SqlStart()
+
+	paramUserId := c.Param("id")
+	fmt.Println("userId:", paramUserId)
+
+	userId, err := strconv.Atoi(paramUserId)
+	if err != nil {
+		log.Fatalf("GetuUser strconv.Atoi error err:%v", err)
+	}
+
+	var responseData struct {
+		ID        int    `json:"id"`
+		FirstName string `json:"firstName"`
+		LastName  string `json:"lastName"`
+		Birthday  int    `json:"birthday"`
+		Email     string `json:"email"`
+	}
+
+	user, _ := model.GetSingleRow(db, userId)
+
+	responseData.ID = user.ID
+	responseData.FirstName = user.FirstName
+	responseData.LastName = user.LastName
+	responseData.Birthday = user.Birthday
+	responseData.Email = user.Email
+
+	c.JSON(http.StatusOK, responseData)
+	defer db.Close()
+}
+
 func UpdateUser(c *gin.Context) {
+	db, _ := model.SqlStart()
 	userId := c.Param("id")
-	fmt.Println("userId:", userId)
 
 	var data struct {
 		FirstName string `json:"firstName"`
 		LastName  string `json:"lastName"`
 		Birthday  int    `json:"birthday"`
 		Email     string `json:"email"`
+		Password  string `json:"password"`
 	}
 
 	if err := c.BindJSON(&data); err != nil {
@@ -75,7 +107,8 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("lastName:", data.LastName)
+	model.UpdateUser(db, userId, data.FirstName, data.LastName, data.Password)
 
 	c.JSON(http.StatusOK, data)
+	defer db.Close()
 }

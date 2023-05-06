@@ -97,7 +97,13 @@ func InsertUser(db *sql.DB, firstName, lastName string, birthday int, email stri
 	return err
 }
 
-func UpdateUser(db *sql.DB, firstName, lastName string, birthday int, email string, password string) error {
+func UpdateUser(db *sql.DB, id, firstName, lastName string, password string) error {
+	hashPassword, _ := domain.HashPassword(password)
+	_, err := db.Exec("UPDATE users SET first_Name = ?, last_Name = ?, password = ? WHERE id = ?", firstName, lastName, hashPassword, id)
+	if err != nil {
+		log.Fatalf("updateUser db.Exec error %v", err)
+		return err
+	}
 	return nil
 }
 

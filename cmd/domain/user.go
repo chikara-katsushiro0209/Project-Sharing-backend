@@ -14,3 +14,13 @@ func HashPassword(password string) (string, error) {
 
 	return string(hashedPassword), nil
 }
+
+func ConfirmPassword(password, hashedPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	if err != nil {
+		log.Fatalf("HashPassword bcrypt.ConfirmPassword err:%v", err)
+		return false
+	}
+
+	return true
+}

@@ -1,0 +1,19 @@
+# .air.toml
+
+root = "."
+tmp_dir = "tmp"
+build_dir = "./cmd/api"
+app_port = "8080"
+app_root = ""
+exclude_dir = []
+include_ext = ["go"]
+include_dir = ["./"]
+bin = "back-end"
+air_args = "-c .air.toml"
+
+[runner]
+  # mainパッケージと、cmd/apiパッケージのファイルをすべてビルドして実行
+  cmd = "go run ./cmd/api/..."
+[build]
+  # mainパッケージと、cmd/apiパッケージのファイルをすべてビルド
+  cmd = "go build -o ./tmp/main ./cmd/api/..."
