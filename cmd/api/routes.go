@@ -12,8 +12,7 @@ func (app *application) routes() http.Handler {
 
 	router.Use(app.enableCORS())
 
-	// router.GET("/", controller.Home)
-	// router.GET("/movies", controller.AllMovies)
+	router.PUT("/login", controller.Login)
 	router.GET("/users", controller.AllUsers)
 	router.GET("/users/:id", controller.GetUser)
 	router.PUT("/users/:id", controller.UpdateUser)

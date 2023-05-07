@@ -6,19 +6,20 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func HashPassword(password string) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func HashPassword(password string) ([]byte, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		log.Fatalf("HashPassword bcrypt.GenerateFromPassword err:%v", err)
+		return nil, err
 	}
 
-	return string(hashedPassword), nil
+	return hashedPassword, nil
 }
 
-func ConfirmPassword(password, hashedPassword string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+func ConfirmPassword(password, hashedPassword []byte) bool {
+	err := bcrypt.CompareHashAndPassword(hashedPassword, password)
 	if err != nil {
-		log.Fatalf("HashPassword bcrypt.ConfirmPassword err:%v", err)
+		log.Printf("ConfirmPassword bcrypt.ConfirmPassword err:%v", err)
 		return false
 	}
 
